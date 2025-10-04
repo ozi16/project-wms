@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained('users');
             $table->dateTime('date')->default(now());
-            $table->foreign('spv')->references('id')->on('users')->onDelete('set null');
+            // $table->foreign('spv')->references('id')->on('users')->onDelete('set null');
             $table->unsignedBigInteger('notif_spv')->nullable();
             $table->timestamps();
         });

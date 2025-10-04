@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Trx extends Model
 {
 
-    protected $fillable = ['user_id', 'notif_spv'];
+    protected $fillable = ['user_id', 'notif_spv', 'date'];
 
     public function user()
     {
@@ -17,7 +17,7 @@ class Trx extends Model
     public function products()
     {
         return $this->belongsToMany(Product::class, 'trx_details', 'trx_id', 'product_id')
-            ->withPivot('status', 'quantity', 'approved_at')
+            ->withPivot('status', 'quantity', 'approved_at', 'spv')
             ->withTimestamps();
     }
 

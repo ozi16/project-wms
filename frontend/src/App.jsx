@@ -5,6 +5,7 @@ import Home from "./components/Home"
 import store from "./redux/store"
 import { Provider } from 'react-redux'
 import PaymentSuccess from "./components/payments/PaymentSuccess"
+import Approve from "./components/Approve"
 
 function App() {
   return (
@@ -14,6 +15,8 @@ function App() {
         <Routes>
           <Route path="/" exact element={<Home />} />
           <Route path="/cart" exact element={<Cart />} />
+          <Route path="/approve" exact element={<Approve />} />
+
         </Routes>
       </BrowserRouter>
     </Provider>
