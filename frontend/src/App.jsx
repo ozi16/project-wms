@@ -4,8 +4,9 @@ import Cart from "./components/cart/Cart"
 import Home from "./components/Home"
 import store from "./redux/store"
 import { Provider } from 'react-redux'
-import PaymentSuccess from "./components/payments/PaymentSuccess"
+
 import Approve from "./components/Approve"
+import OutProduct from "./components/OutProduct"
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
           <Route path="/" exact element={<Home />} />
           <Route path="/cart" exact element={<Cart />} />
           <Route path="/approve" exact element={<Approve />} />
+          <Route path="/out-products" exact elemen={<OutProduct />} />
 
         </Routes>
       </BrowserRouter>

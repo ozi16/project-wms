@@ -96,7 +96,7 @@ export default function Cart() {
 
                             </tbody>
                         </table>
-                        <button onClick={handleSubmit}>Submit Transaksi</button>
+                        <button className='btn btn-primary' onClick={handleSubmit}>Submit Transaksi</button>
                     </div>
                 </div>
             </div>

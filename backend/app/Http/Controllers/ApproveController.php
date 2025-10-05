@@ -13,7 +13,9 @@ class ApproveController extends Controller
      */
     public function index()
     {
-        $res = TrxDetail::with('trx')->get();
+        $res = TrxDetail::with(['trx.user', 'product'])
+            ->orderBy('created_at', 'desc')
+            ->get();
 
         return response()->json($res);
     }
@@ -43,7 +45,7 @@ class ApproveController extends Controller
 
         $trxDetail->status = 1;
         $trxDetail->approved_at = now();
-        $trxDetail->spv = $request->user_id;
+        $trxDetail->spv = $request->user_id ?? 1;
         $trxDetail->save();
 
         // update notif_spv di table trxes
@@ -54,6 +56,7 @@ class ApproveController extends Controller
         }
 
         return response()->json([
+            'success' => true,
             'message' => 'Approved successfully',
             'data' => $trxDetail
         ]);

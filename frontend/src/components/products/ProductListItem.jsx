@@ -22,6 +22,14 @@ export default function ProductListItem({ product }) {
                         </button>
                     </div>
                 </div>
+
+                <div className="card-body ">
+                    <div className="d-flex justify-content-between">
+                        <ul>
+                            <li>{product.product_name}</li>
+                        </ul>
+                    </div>
+                </div>
             </div>
         </div>
     )
