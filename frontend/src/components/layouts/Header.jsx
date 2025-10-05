@@ -21,7 +21,7 @@ export default function Header() {
                             <Link className="nav-link" aria-current="page" to="/">Home</Link>
                         </li>
                         <li className="nav-item">
-                            <Link className="nav-link" aria-current="page" to="/approve-product">Approve</Link>
+                            <Link className="nav-link" aria-current="page" to="/approve">Approve</Link>
                         </li>
                         <li className="nav-item">
                             <Link className="nav-link" aria-current="page" to="/out-products">Out Product</Link>

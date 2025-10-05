@@ -16,3 +16,5 @@ Route::post('/transaksi', [TransaksiController::class, 'storeCart']);
 
 Route::get('/approve', [ApproveController::class, 'index']);
 Route::post('/approve/{id}', [ApproveController::class, 'update']);
+
+Route::get('/out-products', [ApproveController::class, 'index']);
