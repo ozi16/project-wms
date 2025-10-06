@@ -6,7 +6,7 @@ export default function ProductListItem({ product }) {
     const dispatch = useDispatch()
 
     return (
-        <div className="col-md-4 mb-3">
+        <div className="col-16 mb-3">
             <div className="card h-100 shadow-sm">
 
                 <div className="card-body d-flex flex-column">
@@ -23,13 +23,6 @@ export default function ProductListItem({ product }) {
                     </div>
                 </div>
 
-                <div className="card-body ">
-                    <div className="d-flex justify-content-between">
-                        <ul>
-                            <li>{product.product_name}</li>
-                        </ul>
-                    </div>
-                </div>
             </div>
         </div>
     )

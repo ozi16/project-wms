@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class TrxDetail extends Model
 {
-    protected $fillable = ['product_id', 'trx_id', 'quantity', 'spv', 'status', 'approved_at'];
+    protected $fillable = ['product_id', 'trx_id', 'quantity', 'spv', 'status', 'approved_at', 'spv_qty'];
 
     public function trx()
     {

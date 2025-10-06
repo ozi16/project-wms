@@ -17,7 +17,7 @@ class Trx extends Model
     public function products()
     {
         return $this->belongsToMany(Product::class, 'trx_details', 'trx_id', 'product_id')
-            ->withPivot('status', 'quantity', 'approved_at', 'spv')
+            ->withPivot('status', 'quantity', 'approved_at', 'spv', 'spv_qty')
             ->withTimestamps();
     }
 

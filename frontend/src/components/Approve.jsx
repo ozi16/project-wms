@@ -6,6 +6,7 @@ import { toast } from 'react-toastify'
 const Approve = () => {
     const [transaksiDetails, setTransaksiDetails] = useState([])
     const [transactions, setTransactions] = useState([])
+    const [approvingAll, setApprovingAll] = useState({})
 
     const [loading, setLoading] = useState(false)
 
@@ -74,6 +75,27 @@ const Approve = () => {
             toast.error(error.response?.data?.message || 'Failed to submit transaction')
         } finally {
             setLoading(false)
+        }
+    }
+
+    // Approve all items in transaction
+    const handleApproveAll = async (trxId) => {
+        setApprovingAll(prev => ({ ...prev, [trxId]: true }))
+
+        try {
+            const response = await axios.post(`http://127.0.0.1:8000/api/approve/approve-all/${trxId}`, {
+                user_id: userId,
+            })
+
+            if (response.data.success) {
+                toast.success(`All items approved! (${response.data.approved_count} items)`)
+                fetchData()
+            }
+        } catch (error) {
+            console.log('Error approving all items:', error)
+            toast.error(error.response?.data?.message || 'Failed to approve all items')
+        } finally {
+            setApprovingAll(prev => ({ ...prev, [trxId]: false }))
         }
     }
 
@@ -178,6 +200,7 @@ const Approve = () => {
                     const allApproved = trx.product_detail.every(detail => detail.status === 1)
                     const hasApproved = trx.product_detail.some(detail => detail.status === 1)
                     const pendingCount = trx.product_detail.filter(detail => detail.status === 0).length
+                    const hasPending = pendingCount > 0
 
                     return (
                         <div key={trx.id} className="card mb-4 shadow-sm">
@@ -226,6 +249,29 @@ const Approve = () => {
                                 </div>
                             </div>
                             <div className="card-body">
+                                {/* button approve semua */}
+                                {hasPending && trx.notif_spv !== 1 && (
+                                    <div className="mb-3">
+                                        <button
+                                            className='btn btn-success'
+                                            onClick={() => handleApproveAll(trx.id)}
+                                            disabled={approvingAll[trx.id]}
+                                        >
+                                            {approvingAll[trx.id] ? (
+                                                <>
+                                                    <span className='spinner-border spinner-border-sm me-2'></span>
+                                                    Approving
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <i className='bi bi-check-all me-2'></i>
+                                                    Approve all ({pendingCount} items)
+                                                </>
+                                            )}
+
+                                        </button>
+                                    </div>
+                                )}
                                 <div className="table-responsive">
                                     <table className='table table-hover table-bordered'>
                                         <thead className="table-light">
@@ -293,13 +339,35 @@ const Approve = () => {
                                                             <span className="text-muted">-</span>
                                                         )}
                                                     </td>
-                                                    <td>
-                                                        {detail.spv ? (
+                                                    <td className='d-flex align-items-center gap-2'>
+                                                        {/* {detail.spv ? (
                                                             <span className="badge bg-info">
                                                                 User #{detail.spv}
                                                             </span>
                                                         ) : (
                                                             <span className="text-muted">-</span>
+                                                        )} */}
+
+                                                        <input
+                                                            type="number"
+                                                            value={detail.quantity}
+                                                            style={{ width: "40px", textAlign: "center" }}
+
+                                                        />
+
+                                                        {detail.status !== 1 ? (
+                                                            <button
+                                                                onClick={() => handleApprove(detail.id)}
+                                                                className='btn btn-sm btn-primary'
+                                                                disabled={trx.notif_spv === 1}
+                                                            >
+                                                                <i className="bi bi-check-lg me-1"></i>
+                                                                Approve
+                                                            </button>
+                                                        ) : (
+                                                            <span className="text-success">
+                                                                <i className="bi bi-check-circle-fill fs-5"></i>
+                                                            </span>
                                                         )}
                                                     </td>
                                                     <td className="text-center">

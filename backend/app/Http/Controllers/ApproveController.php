@@ -59,25 +59,46 @@ class ApproveController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $trxDetail = TrxDetail::findOrFail($id);
+        try {
 
-        $trxDetail->status = 1;
-        $trxDetail->approved_at = now();
-        $trxDetail->spv = $request->user_id ?? 1;
-        $trxDetail->save();
+            $trxDetail = TrxDetail::findOrFail($id);
 
-        // update notif_spv di table trxes
-        $trx = Trx::find($trxDetail->trx_id);
-        if ($trx) {
-            $trx->notif_spv = $request->user_id;
-            $trx->save();
+            $trxDetail->status = 1;
+            $trxDetail->approved_at = now();
+            $trxDetail->spv = $request->user_id ?? 1;
+            $trxDetail->save();
+
+            // update notif_spv di table trxes
+            $trx = Trx::find($trxDetail->trx_id);
+            if ($trx) {
+                // hanya update notif_spv jika SEMUA detail sudah approved
+                $allApproved = $trx->products()->where('status', '!=', 1)->count() === 0;
+                if ($allApproved) {
+                    $trx->notif_spv = $request->user_id;
+                    $trx->save();
+                }
+            }
+
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Approved successfully',
+                'data' => $trxDetail
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to approve item: ' . $e->getMessage(),
+
+            ]);
         }
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Approved successfully',
-            'data' => $trxDetail
-        ]);
+        // update notif_spv di table trxes
+        // $trx = Trx::find($trxDetail->trx_id);
+        // if ($trx) {
+        //     $trx->notif_spv = $request->user_id;
+        //     $trx->save();
+        // }
     }
 
     //submit transaksi approve dan update stock
@@ -112,6 +133,8 @@ class ApproveController extends Controller
                 ], 400);
             }
 
+
+
             // update stock setiap produknya
             foreach ($trxDetails as $detail) {
                 $product = Product::findOrFail($detail->product_id);
@@ -137,13 +160,58 @@ class ApproveController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Transaction submitted successfully. Stock has been updated.'
+                'message' => 'Transaction submitted successfully. Stock has been updated.',
+                'items_processed' => $trxDetails->count()
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to submit transaction: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * Approve semua transaksi 
+     */
+    public function approveAll(Request $request, $trx_id)
+    {
+        try {
+            DB::beginTransaction();
+
+            // get pending semua item
+            $trxDetails = TrxDetail::where('trx_id', $trx_id)
+                ->where('status', 0)
+                ->get();
+
+            if ($trxDetails->isEmpty()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No pending items to approve'
+                ]);
+            }
+
+            // approve semua items
+            foreach ($trxDetails as $detail) {
+                $detail->status = 1;
+                $detail->approved_at = now();
+                $detail->spv = $request->user_id ?? 1;
+                $detail->save();
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'All items approved successfully',
+                'approved_count' => $trxDetails->count()
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to approve all items: ' . $e->getMessage()
             ]);
         }
     }

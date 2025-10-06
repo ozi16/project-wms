@@ -38,7 +38,7 @@ const OutProduct = () => {
             if (filter === 'today') {
                 return trxDate.toDateString() === now.toDateString()
             } else if (filter === 'week') {
-                const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 1000)
+                const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
                 return trxDate >= weekAgo
             } else if (filter === 'month') {
                 const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
@@ -109,7 +109,7 @@ const OutProduct = () => {
                             <div className="card-body">
                                 <div className="d-flex justify-content-between align-items-center">
                                     <div className="">
-                                        <h6 className='text-uppercase mb-1 '>Total Products</h6>
+                                        <h6 className='text-uppercase mb-1 '>Total Items</h6>
                                         <h2 mb-0>{totalItems}</h2>
                                     </div>
                                     <div className="">
@@ -236,9 +236,13 @@ const OutProduct = () => {
                                                 <th width="20%">
                                                     <i className='bi bi-person-check me-2'>Approved by (SPV)</i>
                                                 </th>
-                                                <th width="30%">
+                                                <th width="20%">
                                                     <i className='bi bi-bi-clock me-2'>Approved At (SPV)</i>
                                                 </th>
+                                                <th width="30%">
+                                                    <i className='bi bi-bi-clock me-2'>Spv-qty</i>
+                                                </th>
+
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -294,13 +298,28 @@ const OutProduct = () => {
                                                 <td>
                                                     <strong>Total Quantity Out:</strong>
                                                 </td>
-                                                <td colSpan="2">
+                                                <td colSpan="3">
                                                     <span className="badge bg-danger fs-6">
                                                         <i className="bi bi-arrow-down-circle me-1"></i>
                                                         {totalQty} pcs
                                                     </span>
                                                 </td>
                                             </tr>
+
+                                            {/* <tr>
+                                                <td colSpan="1">
+                                                    <td>
+                                                        <strong>Total stock product</strong>
+                                                    </td>
+                                                    <td colSpan="2">
+                                                        <span className='badge bg-danger fs-6'>
+                                                            <i className='bi bi-arrorow-down-circle me-1'></i>
+                                                            {}
+                                                        </span>
+                                                    </td>
+                                                </td>
+                                            </tr> */}
+
                                         </tfoot>
                                     </table>
                                 </div>
