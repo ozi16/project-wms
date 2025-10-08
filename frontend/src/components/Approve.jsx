@@ -27,7 +27,7 @@ const Approve = () => {
             })
             setSpvQuantities($initialQty)
         } catch {
-            console.log(console.error())
+            console.log(error)
             toast.error('failed to load transaksi')
 
         }
@@ -55,7 +55,7 @@ const Approve = () => {
     //     }
     // }
 
-    const handleApprove = async (id, maxQty) => {
+    const handleApprove = async (id) => {
         const spvQty = spvQuantities[id]
 
         // Validasi: spv_qty tidak boleh 0 atau kosong
@@ -369,10 +369,11 @@ const Approve = () => {
                                                             type="number"
                                                             // value={detail.quantity}
                                                             style={{ width: "40px", textAlign: "center" }}
-                                                            value={spvQuantities[detail.id] || detail.quantity}
+                                                            // value={spvQuantities[detail.id] || detail.quantity}
+                                                            value={spvQuantities[detail.id] !== undefined ? spvQuantities[detail.id] : detail.quantity}
                                                             onChange={(e) => handleSpvQtyChange(detail.id, e.target.value)}
                                                             min="1"
-                                                            max={detail.quantity}
+                                                            // max={detail.quantity}
                                                             disabled={trx.notif_spv === 1}
                                                         />
 

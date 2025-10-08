@@ -68,12 +68,12 @@ class ApproveController extends Controller
 
             $trxDetail = TrxDetail::findOrFail($id);
 
-            if ($trxDetail->spv_qty > $trxDetail->quantity) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'SPV quantity tidak boleh lebih besar dari quantity yang diminta (' . $trxDetail->quantity . ')'
-                ]);
-            }
+            // if ($trxDetail->spv_qty > $trxDetail->quantity) {
+            //     return response()->json([
+            //         'success' => false,
+            //         'message' => 'SPV quantity tidak boleh lebih besar dari quantity yang diminta (' . $trxDetail->quantity . ')'
+            //     ]);
+            // }
 
             // 
 
@@ -156,13 +156,13 @@ class ApproveController extends Controller
                 // Gunakan spv_qty jika ada, jika tidak gunakan quantity
                 $qtyToReduce = $detail->spv_qty ?? $detail->quantity;
 
-                if ($product->stock < $detail->quantity) {
-                    DB::rollBack();
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'stock tidak mencukupi untuk {$product->product_name}. Available: {$product->stock}, Requested: {$detail->quantity}'
-                    ]);
-                }
+                // if ($product->stock < $detail->quantity) {
+                //     DB::rollBack();
+                //     return response()->json([
+                //         'success' => false,
+                //         'message' => 'stock tidak mencukupi untuk {$product->product_name}. Available: {$product->stock}, Requested: {$detail->quantity}'
+                //     ]);
+                // }
 
                 $product->stock -= $qtyToReduce;
                 $product->save();
