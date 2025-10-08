@@ -4,9 +4,10 @@ import ProductApprove from './products/ProductApprove'
 import { toast } from 'react-toastify'
 
 const Approve = () => {
-    const [transaksiDetails, setTransaksiDetails] = useState([])
+    // const [transaksiDetails, setTransaksiDetails] = useState([])
     const [transactions, setTransactions] = useState([])
     const [approvingAll, setApprovingAll] = useState({})
+    const [spvQuantities, setSpvQuantities] = useState({})
 
     const [loading, setLoading] = useState(false)
 
@@ -16,11 +17,27 @@ const Approve = () => {
             console.log(res.data)
             // setTransaksiDetails(res.data)
             setTransactions(res.data)
+
+            // initial spv quentity
+            $initialQty = {}
+            res.data.forEach(trx => {
+                trx.product_detail.forEach(detail => {
+                    $initialQty[detail.id] = detail.spv_qty || detail.quantity
+                })
+            })
+            setSpvQuantities($initialQty)
         } catch {
             console.log(console.error())
             toast.error('failed to load transaksi')
 
         }
+    }
+
+    const handleSpvQtyChange = (detailId, value) => {
+        setSpvQuantities(prev => ({
+            ...prev,
+            [detailId]: parseInt(value) || 0
+        }))
     }
 
     const userId = 1
@@ -38,11 +55,25 @@ const Approve = () => {
     //     }
     // }
 
-    const handleApprove = async (id) => {
-        try {
+    const handleApprove = async (id, maxQty) => {
+        const spvQty = spvQuantities[id]
 
+        // Validasi: spv_qty tidak boleh 0 atau kosong
+        // if (!spvQty || spvQty <= 0) {
+        //     toast.error('SPV Quantity harus lebih dari 0')
+        //     return
+        // }
+
+        // validasi spv tidak boleh lebih besar dari quantity yang diminta
+        // if (spvQty > maxQty) {
+        //     toast.error(`SPV Quantity tidak boleh llebih dari ${maxQty}`)
+        //     return
+        // }
+
+        try {
             const res = await axios.post(`http://localhost:8000/api/approve/${id}`, {
                 user_id: userId,
+                spv_qty: spvQty
             })
 
             if (res.data.success) {
@@ -61,6 +92,7 @@ const Approve = () => {
         }
 
         try {
+            setLoading(true)
             const response = await axios.post('http://127.0.0.1:8000/api/approve/submit', {
                 trx_id: trxId
             })
@@ -69,7 +101,6 @@ const Approve = () => {
                 toast.success('Transaction submitted successfully! Stock has been updated.')
                 fetchData()
             }
-            setLoading(true)
         } catch (error) {
             console.log('Error submitting transaction:', error)
             toast.error(error.response?.data?.message || 'Failed to submit transaction')
@@ -284,22 +315,23 @@ const Approve = () => {
                                                     <i className="bi bi-info-circle me-2"></i>
                                                     Status
                                                 </th>
+                                                <th width="15%">
+                                                    <i className="bi bi-person-check me-2"></i>
+                                                    SPV Qty
+                                                </th>
                                                 <th width="20%">
                                                     <i className="bi bi-clock-history me-2"></i>
                                                     Approved At
                                                 </th>
-                                                <th width="15%">
-                                                    <i className="bi bi-person-check me-2"></i>
-                                                    SPV
-                                                </th>
-                                                <th width="10%" className="text-center">
+
+                                                {/* <th width="10%" className="text-center">
                                                     <i className="bi bi-gear me-2"></i>
                                                     Action
-                                                </th>
+                                                </th> */}
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {trx.product_detail.map((detail, index) => (
+                                            {trx.product_detail.map((detail) => (
                                                 <tr key={detail.id} className={detail.status === 1 ? 'table-success' : ''}>
                                                     <td>
                                                         <div className="d-flex justify-content-between align-items-center">
@@ -324,6 +356,41 @@ const Approve = () => {
                                                             </span>
                                                         )}
                                                     </td>
+                                                    <td className='d-flex align-items-center gap-2'>
+                                                        {/* {detail.spv ? (
+                                                            <span className="badge bg-info">
+                                                                User #{detail.spv}
+                                                            </span>
+                                                        ) : (
+                                                            <span className="text-muted">-</span>
+                                                        )} */}
+
+                                                        <input
+                                                            type="number"
+                                                            // value={detail.quantity}
+                                                            style={{ width: "40px", textAlign: "center" }}
+                                                            value={spvQuantities[detail.id] || detail.quantity}
+                                                            onChange={(e) => handleSpvQtyChange(detail.id, e.target.value)}
+                                                            min="1"
+                                                            max={detail.quantity}
+                                                            disabled={trx.notif_spv === 1}
+                                                        />
+
+                                                        {detail.status !== 1 ? (
+                                                            <button
+                                                                onClick={() => handleApprove(detail.id, detail.quantity)}
+                                                                className='btn btn-sm btn-primary'
+                                                                disabled={trx.notif_spv === 1}
+                                                            >
+                                                                <i className="bi bi-check-lg me-1"></i>
+                                                                Approve
+                                                            </button>
+                                                        ) : (
+                                                            <span className="text-success">
+                                                                <i className="bi bi-check-circle-fill fs-5"></i>
+                                                            </span>
+                                                        )}
+                                                    </td>
                                                     <td>
                                                         {detail.approved_at ? (
                                                             <small>
@@ -339,22 +406,8 @@ const Approve = () => {
                                                             <span className="text-muted">-</span>
                                                         )}
                                                     </td>
-                                                    <td className='d-flex align-items-center gap-2'>
-                                                        {/* {detail.spv ? (
-                                                            <span className="badge bg-info">
-                                                                User #{detail.spv}
-                                                            </span>
-                                                        ) : (
-                                                            <span className="text-muted">-</span>
-                                                        )} */}
 
-                                                        <input
-                                                            type="number"
-                                                            value={detail.quantity}
-                                                            style={{ width: "40px", textAlign: "center" }}
-
-                                                        />
-
+                                                    {/* <td className="text-center">
                                                         {detail.status !== 1 ? (
                                                             <button
                                                                 onClick={() => handleApprove(detail.id)}
@@ -369,23 +422,7 @@ const Approve = () => {
                                                                 <i className="bi bi-check-circle-fill fs-5"></i>
                                                             </span>
                                                         )}
-                                                    </td>
-                                                    <td className="text-center">
-                                                        {detail.status !== 1 ? (
-                                                            <button
-                                                                onClick={() => handleApprove(detail.id)}
-                                                                className='btn btn-sm btn-primary'
-                                                                disabled={trx.notif_spv === 1}
-                                                            >
-                                                                <i className="bi bi-check-lg me-1"></i>
-                                                                Approve
-                                                            </button>
-                                                        ) : (
-                                                            <span className="text-success">
-                                                                <i className="bi bi-check-circle-fill fs-5"></i>
-                                                            </span>
-                                                        )}
-                                                    </td>
+                                                    </td> */}
                                                 </tr>
                                             ))}
                                         </tbody>

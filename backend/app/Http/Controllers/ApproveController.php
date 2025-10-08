@@ -61,11 +61,28 @@ class ApproveController extends Controller
     {
         try {
 
+            // menambahkan input pada spv
+            $request->validate([
+                'spv_qty' => 'required|integer|min:1'
+            ]);
+
+            $trxDetail = TrxDetail::findOrFail($id);
+
+            if ($trxDetail->spv_qty > $trxDetail->quantity) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'SPV quantity tidak boleh lebih besar dari quantity yang diminta (' . $trxDetail->quantity . ')'
+                ]);
+            }
+
+            // 
+
             $trxDetail = TrxDetail::findOrFail($id);
 
             $trxDetail->status = 1;
             $trxDetail->approved_at = now();
             $trxDetail->spv = $request->user_id ?? 1;
+            $trxDetail->spv_qty = $request->spv_qty;
             $trxDetail->save();
 
             // update notif_spv di table trxes
@@ -78,7 +95,6 @@ class ApproveController extends Controller
                     $trx->save();
                 }
             }
-
 
             return response()->json([
                 'success' => true,
@@ -133,11 +149,12 @@ class ApproveController extends Controller
                 ], 400);
             }
 
-
-
-            // update stock setiap produknya
+            // update stock setiap produknya menggunakan spv_qty
             foreach ($trxDetails as $detail) {
                 $product = Product::findOrFail($detail->product_id);
+
+                // Gunakan spv_qty jika ada, jika tidak gunakan quantity
+                $qtyToReduce = $detail->spv_qty ?? $detail->quantity;
 
                 if ($product->stock < $detail->quantity) {
                     DB::rollBack();
@@ -147,7 +164,7 @@ class ApproveController extends Controller
                     ]);
                 }
 
-                $product->stock -= $detail->quantity;
+                $product->stock -= $qtyToReduce;
                 $product->save();
             }
 
@@ -197,6 +214,7 @@ class ApproveController extends Controller
                 $detail->status = 1;
                 $detail->approved_at = now();
                 $detail->spv = $request->user_id ?? 1;
+                $detail->spv_qty = $detail->quantity;
                 $detail->save();
             }
 

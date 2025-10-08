@@ -191,7 +191,8 @@ const OutProduct = () => {
             ) : (
                 filterTransaksi.map((trx) => {
                     const approveItems = trx.product_detail.filter(detail => detail.status === 1)
-                    const totalQty = approveItems.reduce((sum, detail) => sum + detail.quantity, 0)
+                    // const totalQty = approveItems.reduce((sum, detail) => sum + detail.quantity, 0)
+                    const totalQty = approveItems.reduce((sum, detail) => sum + detail.spv_qty, 0)
 
                     return (
                         <div key={trx.id} className="card mb-4 shadow-sm">
@@ -259,7 +260,7 @@ const OutProduct = () => {
                                                             </div>
                                                             <span className='badge bg-danger fs-6'>
                                                                 <i className='bi bi-arrow-down me-1'></i>
-                                                                {detail.quantity} pcs
+                                                                {detail.spv_qty} pcs
                                                             </span>
                                                         </div>
                                                     </td>
@@ -288,6 +289,12 @@ const OutProduct = () => {
                                                         ) : (
                                                             <span className="text-muted">-</span>
                                                         )}
+                                                    </td>
+                                                    <td className=''>
+                                                        <span className='badge bg-success fs-6'>
+                                                            <i className='bi bi-arrow-down-circle me-1'></i>
+                                                            {detail.spv_qty} pcs
+                                                        </span>
                                                     </td>
                                                 </tr>
                                             ))}
