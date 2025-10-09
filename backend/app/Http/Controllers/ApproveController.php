@@ -63,7 +63,7 @@ class ApproveController extends Controller
 
             // menambahkan input pada spv
             $request->validate([
-                'spv_qty' => 'required|integer|min:1'
+                'spv_qty' => 'integer'
             ]);
 
             $trxDetail = TrxDetail::findOrFail($id);
@@ -156,13 +156,13 @@ class ApproveController extends Controller
                 // Gunakan spv_qty jika ada, jika tidak gunakan quantity
                 $qtyToReduce = $detail->spv_qty ?? $detail->quantity;
 
-                // if ($product->stock < $detail->quantity) {
-                //     DB::rollBack();
-                //     return response()->json([
-                //         'success' => false,
-                //         'message' => 'stock tidak mencukupi untuk {$product->product_name}. Available: {$product->stock}, Requested: {$detail->quantity}'
-                //     ]);
-                // }
+                if ($product->stock < $detail->quantity) {
+                    DB::rollBack();
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'stock tidak mencukupi untuk {$product->product_name}. Available: {$product->stock}, Requested: {$detail->quantity}'
+                    ]);
+                }
 
                 $product->stock -= $qtyToReduce;
                 $product->save();

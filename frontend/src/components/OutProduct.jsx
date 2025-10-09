@@ -191,7 +191,7 @@ const OutProduct = () => {
             ) : (
                 filterTransaksi.map((trx) => {
                     const approveItems = trx.product_detail.filter(detail => detail.status === 1)
-                    // const totalQty = approveItems.reduce((sum, detail) => sum + detail.quantity, 0)
+                    const totalQtyQ = approveItems.reduce((sum, detail) => sum + detail.quantity, 0)
                     const totalQty = approveItems.reduce((sum, detail) => sum + detail.spv_qty, 0)
 
                     return (
@@ -260,7 +260,7 @@ const OutProduct = () => {
                                                             </div>
                                                             <span className='badge bg-danger fs-6'>
                                                                 <i className='bi bi-arrow-down me-1'></i>
-                                                                {detail.spv_qty} pcs
+                                                                {detail.spv_qty || detail.quantity} pcs
                                                             </span>
                                                         </div>
                                                     </td>
@@ -293,7 +293,7 @@ const OutProduct = () => {
                                                     <td className=''>
                                                         <span className='badge bg-success fs-6'>
                                                             <i className='bi bi-arrow-down-circle me-1'></i>
-                                                            {detail.spv_qty} pcs
+                                                            {detail.spv_qty || detail.quantity} pcs
                                                         </span>
                                                     </td>
                                                 </tr>
@@ -308,7 +308,7 @@ const OutProduct = () => {
                                                 <td colSpan="3">
                                                     <span className="badge bg-danger fs-6">
                                                         <i className="bi bi-arrow-down-circle me-1"></i>
-                                                        {totalQty} pcs
+                                                        {totalQty || totalQtyQ} pcs
                                                     </span>
                                                 </td>
                                             </tr>

@@ -11,6 +11,9 @@ const Approve = () => {
 
     const [loading, setLoading] = useState(false)
 
+    const userId = 1
+
+
     const fetchData = async () => {
         try {
             const res = await axios.get('http://127.0.0.1:8000/api/approve')
@@ -19,15 +22,15 @@ const Approve = () => {
             setTransactions(res.data)
 
             // initial spv quentity
-            $initialQty = {}
+            const initialQty = {}
             res.data.forEach(trx => {
                 trx.product_detail.forEach(detail => {
-                    $initialQty[detail.id] = detail.spv_qty || detail.quantity
+                    initialQty[detail.id] = detail.spv_qty || detail.quantity
                 })
             })
-            setSpvQuantities($initialQty)
+            setSpvQuantities(initialQty)
         } catch {
-            console.log(error)
+            console.log('error :', error)
             toast.error('failed to load transaksi')
 
         }
@@ -40,7 +43,6 @@ const Approve = () => {
         }))
     }
 
-    const userId = 1
 
 
     // const handleApprove = async (id) => {
@@ -339,7 +341,7 @@ const Approve = () => {
                                                                 <strong>{detail.product?.product_name || 'Unknown Product'}</strong>
                                                             </div>
                                                             <span className="badge bg-secondary fs-6 ms-2">
-                                                                {detail.quantity} pcs
+                                                                Request: {detail.quantity} pcs
                                                             </span>
                                                         </div>
                                                     </td>
@@ -368,9 +370,9 @@ const Approve = () => {
                                                         <input
                                                             type="number"
                                                             // value={detail.quantity}
+                                                            value={spvQuantities[detail.id] || detail.quantity}
                                                             style={{ width: "40px", textAlign: "center" }}
-                                                            // value={spvQuantities[detail.id] || detail.quantity}
-                                                            value={spvQuantities[detail.id] !== undefined ? spvQuantities[detail.id] : detail.quantity}
+                                                            // value={spvQuantities[detail.id] !== undefined ? spvQuantities[detail.id] : detail.quantity}
                                                             onChange={(e) => handleSpvQtyChange(detail.id, e.target.value)}
                                                             min="1"
                                                             // max={detail.quantity}

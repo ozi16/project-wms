@@ -21,10 +21,13 @@ export default function Header() {
                             <Link className="nav-link" aria-current="page" to="/">Home</Link>
                         </li>
                         <li className="nav-item">
-                            <Link className="nav-link" aria-current="page" to="/approve">Approve</Link>
+                            <Link className="nav-link" aria-current="page" to="/approve">Approve Product</Link>
                         </li>
                         <li className="nav-item">
-                            <Link className="nav-link" aria-current="page" to="/out-products">Out Product</Link>
+                            <Link className="nav-link" aria-current="page" to="/out-products-final">Out Product</Link>
+                        </li>
+                        <li className="nav-item">
+                            <Link className="nav-link" aria-current="page" to="/out-products">History</Link>
                         </li>
 
                     </ul>
